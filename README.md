@@ -64,3 +64,26 @@ _sudo chmod a+r /etc/apt/keyrings/docker.asc_
 > sudo apt update
 > sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 >   sudo systemctl status docker
+
+---
+
+# What is YAML?
+
+YAML is a computer data serialization language.
+
+A YAML document represents a computer program's native data structure in a human readable text form. A node in a YAML document can have three basic data types: 
+
+- Scalar
+  Atomic data types like strings, numbers, booleans and null
+- Sequence
+  A list of nodes
+- Mapping
+  A map of nodes to nodes. Also known as Hashes, Hash Maps, Dictionaries or Objects.
+  Unlike in many programming languages, a key can be more than just a string.
+  It can be a sequence or mapping itself.
+
+On top of that, YAML allows to serialize all other data types and classes:
+- Alias and Anchor
+  For serializing References / Pointers, including circular references.
+- Tag
+  With Tags it's possible to define custom types/classes.
