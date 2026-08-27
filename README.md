@@ -87,3 +87,13 @@ On top of that, YAML allows to serialize all other data types and classes:
   For serializing References / Pointers, including circular references.
 - Tag
   With Tags it's possible to define custom types/classes.
+
+
+
+
+
+
+
+
+⚙️ RUN : Executes shell commands during the image build process and commits the resulting files as a new read-only image layer.
+📦 --no-cache: flag for Downloads packages directly without storing the index tarballs in /var/cache/apk/, keeping the image size minimal.
