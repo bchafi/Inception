@@ -1,3 +1,14 @@
-ports: 443:443
-
-image: nginx
+services:
+  nginx:
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    image: nginx:${NGINX_VERSION}
+    container_name: nginx
+    ports:
+      - "443:443"
+    networks:
+      - inception_net
+    volumes:
+      - wp_volume:/var/www/wordpress
+    restart: always
