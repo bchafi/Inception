@@ -12,7 +12,7 @@ RUN mkdir -p /etc/ssl/private /etc/ssl/certs && \
     -subj "/C=MA/ST=Khouribga/L=Khouribga/O=1337/OU=1337/CN=bchafi.42.fr"
 
 # Step 4: Configuration
-COPY conf/nginx.conf /etc/nginx/conf/nginx.conf
+COPY conf/nginx.conf /etc/nginx/nginx.conf
 
 # Step 5: Network
 EXPOSE 443
