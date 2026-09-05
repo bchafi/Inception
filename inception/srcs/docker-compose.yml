@@ -1,6 +1,24 @@
+networks:
+  inception_net:
+    driver: bridge
+
+volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/bchafi/data/wordpress
+      o: bind
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/bchafi/data/mariadb
+      o: bind
+
 services:
   nginx:
-    build:
+    build: 
       context: ./requirements/nginx
       dockerfile: Dockerfile
     image: nginx:${NGINX_VERSION}
@@ -10,5 +28,37 @@ services:
     networks:
       - inception_net
     volumes:
-      - wp_volume:/var/www/wordpress
+      - wordpress_data:/var/www/wordpress
+    restart: always
+  mariadb:
+    build: 
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    image: mariadb:${MARIADB_VERSION}
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - inception_net
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: always
+  wordpress:
+    build: 
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    image: wordpress:${WORDPRESS_VERSION}
+    container_name: wordpress
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    networks:
+      - inception_net
+    volumes:
+      - wordpress_data:/var/www/wordpress
     restart: always
