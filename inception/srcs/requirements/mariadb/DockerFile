@@ -1,0 +1,8 @@
+FROM alpine:3.18
+
+RUN apk update && apk add --no-cache mariadb mariadb-client
+
+COPY tools/setup.sh /tmp/setup.sh
+RUN chmod +x /tmp/setup.sh
+
+ENTRYPOINT ["sh", "/tmp/setup.sh"]

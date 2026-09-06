@@ -30,35 +30,35 @@ services:
     volumes:
       - wordpress_data:/var/www/wordpress
     restart: always
-  mariadb:
-    build: 
-      context: ./requirements/mariadb
-      dockerfile: Dockerfile
-    image: mariadb:${MARIADB_VERSION}
-    container_name: mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    networks:
-      - inception_net
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    restart: always
-  wordpress:
-    build: 
-      context: ./requirements/wordpress
-      dockerfile: Dockerfile
-    image: wordpress:${WORDPRESS_VERSION}
-    container_name: wordpress
-    environment:
-      WORDPRESS_DB_HOST: mariadb:3306
-      WORDPRESS_DB_USER: ${MYSQL_USER}
-      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
-      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
-    networks:
-      - inception_net
-    volumes:
-      - wordpress_data:/var/www/wordpress
-    restart: always
+  # mariadb:
+  #   build: 
+  #     context: ./requirements/mariadb
+  #     dockerfile: Dockerfile
+  #   image: mariadb:${MARIADB_VERSION}
+  #   container_name: mariadb
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #   networks:
+  #     - inception_net
+  #   volumes:
+  #     - mariadb_data:/var/lib/mysql
+  #   restart: always
+  # wordpress:
+  #   build: 
+  #     context: ./requirements/wordpress
+  #     dockerfile: Dockerfile
+  #   image: wordpress:${WORDPRESS_VERSION}
+  #   container_name: wordpress
+  #   environment:
+  #     WORDPRESS_DB_HOST: mariadb:3306
+  #     WORDPRESS_DB_USER: ${MYSQL_USER}
+  #     WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+  #     WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+  #   networks:
+  #     - inception_net
+  #   volumes:
+  #     - wordpress_data:/var/www/wordpress
+  #   restart: always
