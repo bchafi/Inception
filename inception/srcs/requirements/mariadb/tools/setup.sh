@@ -1,23 +1,40 @@
 #!/bin/sh
 
-# 1. Check if the database is already installed
+# Ensure proper directory permissions inside the container filesystem
+chown -R mysql:mysql /var/lib/mysql
+
+# 1. Check if the database system tables are initialized
 if [ ! -d "/var/lib/mysql/mysql" ]; then
-    echo "Initializing database..."
+    echo "First boot: Initializing MariaDB database files..."
     
-    # Bootstrap the basic database structure
+    # Generate raw system databases and tables
     mariadb-install-db --user=mysql --datadir=/var/lib/mysql
     
-    # Start the database temporarily in the background
-    mysqld --user=mysql --datadir=/var/lib/mysql &
-    sleep 5 # Wait for it to boot
+    # Start the daemon temporarily in the background
+    # --skip-networking prevents remote access during configuration for security
+    mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
+    pid=$!
     
-    # TODO: Inject SQL commands here using $DB_NAME, $DB_USER, $DB_PASSWORD
-    # mariadb -u root -e "CREATE DATABASE IF NOT EXISTS ..."
+    # Socratic verification: Waiting for the local socket to open
+    for i in $(seq 1 30); do
+        if mysqladmin ping >/dev/null 2>&1; then
+            break
+        fi
+        sleep 1
+    done
+    # Inject secure configurations using environment variables passed by Compose
+    mysql -u root <<EOF
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+FLUSH PRIVILEGES;
+EOF
     
-    # Stop the temporary background process securely
-    mysqladmin -u root shutdown
+    # Clean up and shutdown the temporary background daemon
+    mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
 fi
 
-echo "Starting MariaDB daemon..."
-# 2. Handoff to PID 1 in the foreground
+echo "Starting MariaDB daemon in the foreground (PID 1)..."
+# 2. Re-launch mysqld replacing the shell script process space
 exec mysqld --user=mysql --datadir=/var/lib/mysql
