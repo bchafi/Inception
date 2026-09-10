@@ -1,40 +1,29 @@
 #!/bin/sh
 
-# Ensure proper directory permissions inside the container filesystem
-chown -R mysql:mysql /var/lib/mysql
+# 1. Wait for MariaDB to be fully ready by testing a real login
+echo "Waiting for MariaDB database to start..."
+while ! mariadb -h mariadb -u $MYSQL_USER -p$MYSQL_PASSWORD -e "SELECT 1;" >/dev/null 2>&1; do
+    sleep 2
+done
+echo "MariaDB is ready!"
 
-# 1. Check if the database system tables are initialized
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    echo "First boot: Initializing MariaDB database files..."
+# 2. Download and configure WordPress (if it doesn't already exist)
+if [ ! -f /var/www/wordpress/wp-config.php ]; then
+    echo "Installing WordPress..."
     
-    # Generate raw system databases and tables
-    mariadb-install-db --user=mysql --datadir=/var/lib/mysql
+    # Download core files
+    wp core download --allow-root
     
-    # Start the daemon temporarily in the background
-    # --skip-networking prevents remote access during configuration for security
-    mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
-    pid=$!
+    # Generate wp-config.php using your .env variables
+    wp config create --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD --dbhost=mariadb --allow-root
     
-    # Socratic verification: Waiting for the local socket to open
-    for i in $(seq 1 30); do
-        if mysqladmin ping >/dev/null 2>&1; then
-            break
-        fi
-        sleep 1
-    done
-    # Inject secure configurations using environment variables passed by Compose
-    mysql -u root <<EOF
-CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
-CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-FLUSH PRIVILEGES;
-EOF
+    # Install the actual CMS and create the Admin user
+    wp core install --url=bchafi.42.fr --title="Inception" --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASSWORD --admin_email=$WP_ADMIN_EMAIL --allow-root
     
-    # Clean up and shutdown the temporary background daemon
-    mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
+    # Create a second standard user
+    wp user create $WP_USER $WP_USER_EMAIL --role=author --user_pass=$WP_USER_PASSWORD --allow-root
 fi
 
-echo "Starting MariaDB daemon in the foreground (PID 1)..."
-# 2. Re-launch mysqld replacing the shell script process space
-exec mysqld --user=mysql --datadir=/var/lib/mysql
+echo "Starting PHP-FPM..."
+# 3. Take over PID 1
+exec php-fpm81 -F

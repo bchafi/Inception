@@ -48,22 +48,16 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
     restart: always
-  # wordpress:
-  #   build:
-  #     context: ./requirements/wordpress
-  #     dockerfile: Dockerfile
-  #   image: wordpress:${WORDPRESS_VERSION}
-  #   container_name: wordpress
-  #   ports:
-  #     - "5050:5050"
-  #   environment:
-  #     WORDPRESS_DB_HOST: mariadb:3306
-  #     WORDPRESS_DB_USER: ${MYSQL_USER}
-  #     WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
-  #     WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
-  #   networks:
-  #     - inception_net
-  #   volumes:
-  #     - wordpress_data:/var/www/wordpress
-  #   restart: always
-
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    image: wordpress:5.8
+    container_name: wordpress
+    env_file:
+      - ./.env # <--- THIS IS THE MISSING LINK
+    networks:
+      - inception_net
+    volumes:
+      - wordpress_data:/var/www/wordpress
+    restart: always
