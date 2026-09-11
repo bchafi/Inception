@@ -1,22 +1,23 @@
 #!/bin/sh
 
-# Wait for MariaDB to be fully booted and listening on the bridge network
+# 1. Wait for MariaDB to be fully booted and listening on the bridge network
 until mysqladmin ping -h"mariadb" --silent; do
     echo "Waiting for MariaDB database to start..."
     sleep 2
 done
 
-# If wp-config.php does not exist, download and configure WordPress
+# 2. If wp-config.php does not exist, download and configure WordPress
 if [ ! -f "wp-config.php" ]; then
     echo "Downloading WordPress core files..."
-    wp core download --allow-root
+    # Invoke php81 directly with 512M RAM limit to bypass Alpine's default cap
+    php81 -d memory_limit=512M /usr/local/bin/wp core download --allow-root
 
-    echo "Creating wp-config.php..."
-    wp config create \
-        --dbname="${MYSQL_DATABASE}" \
-        --dbuser="${MYSQL_USER}" \
-        --dbpass="${MYSQL_PASSWORD}" \
-        --dbhost="mariadb:3306" \
+        echo "Creating wp-config.php..."
+        wp config create \
+            --dbname="${MYSQL_DATABASE}" \
+            --dbuser="${MYSQL_USER}" \
+            --dbpass="${MYSQL_PASSWORD}" \
+            --dbhost="mariadb:3306" \
         --allow-root
 
     echo "Installing WordPress..."
@@ -38,5 +39,4 @@ if [ ! -f "wp-config.php" ]; then
 fi
 
 echo "Starting PHP-FPM in the foreground (PID 1)..."
-# Replace the shell process image in memory with php-fpm running in the foreground
 exec php-fpm81 -F

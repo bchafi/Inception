@@ -47,3 +47,6 @@ logs:
 
 ps:
 	docker compose -f $(COMPOSE_FILE) ps
+
+images:
+	docker compose -f $(COMPOSE_FILE) images

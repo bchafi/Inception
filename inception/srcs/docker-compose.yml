@@ -21,7 +21,7 @@ services:
     build:
       context: ./requirements/nginx
       dockerfile: Dockerfile
-    image: nginx:${NGINX_VERSION}
+    image: nginx
     container_name: nginx
     ports:
       - "443:443"
@@ -34,7 +34,7 @@ services:
     build:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
-    image: mariadb:${MARIADB_VERSION}
+    image: mariadb
     container_name: mariadb
     ports:
       - "3306:3306"
@@ -52,7 +52,7 @@ services:
     build:
       context: ./requirements/wordpress
       dockerfile: Dockerfile
-    image: wordpress:5.8
+    image: wordpress
     container_name: wordpress
     env_file:
       - ./.env # <--- THIS IS THE MISSING LINK
