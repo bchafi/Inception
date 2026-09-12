@@ -55,7 +55,7 @@ services:
     image: wordpress
     container_name: wordpress
     env_file:
-      - ./.env # <--- THIS IS THE MISSING LINK
+      - ./.env
     networks:
       - inception_net
     volumes:
