@@ -1,6 +1,6 @@
-# Inception - Developer Documentation (DEV_DOC.md)
-
 *This project has been created as part of the 42 curriculum by bchafi.*
+
+# Inception - Developer Documentation (DEV_DOC.md)
 
 ---
 
@@ -17,25 +17,25 @@ Ensure your local user account belongs to the `docker` user group to execute com
 sudo usermod -aG docker \$USER && newgrp docker
 ```
 
-### Configuration Files & Secrets (`srcs/.env`)
+### Configuration Files (`srcs/.env`)
 
 The stack relies on `srcs/.env` for runtime configuration. Create the file under `srcs/.env` with the following structure:
 
 ```
-DOMAIN_NAME=bchafi.42.fr
+DOMAIN_NAME=
 
-MYSQL_DATABASE=bader_db
-MYSQL_USER=bader
-MYSQL_PASSWORD=8520
-MYSQL_ROOT_PASSWORD=7410
+MYSQL_DATABASE=
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_ROOT_PASSWORD=
 
-WP_ADMIN_USER=bader_admin
-WP_ADMIN_PASSWORD=admin_secure_pass
-WP_ADMIN_EMAIL=admin@bchafi.42.fr
+WP_ADMIN_USER=
+WP_ADMIN_PASSWORD=
+WP_ADMIN_EMAIL=
 
 WP_USER=bader_author
-WP_USER_PASSWORD=author_secure_pass
-WP_USER_EMAIL=author@bchafi.42.fr
+WP_USER_PASSWORD=
+WP_USER_EMAIL=
 ```
 
 ---
@@ -119,7 +119,7 @@ Data persistence is handled by mapping container internal directories directly t
 
 ### Volume Persistence Engineering
 
-Direct bind mounts declared directly inside service blocks (e.g., `- /host/path:/container/path`) are forbidden by project rules [cite: 3, 13]. To ensure persistence while satisfying this constraint, storage is configured using **Docker Global Named Volumes** with kernel-level `local` driver options in `srcs/docker-compose.yml`:
+Direct bind mounts declared directly inside service blocks (e.g., `- /host/path:/container/path`) are forbidden by project rules. To ensure persistence while satisfying this constraint, storage is configured using **Docker Global Named Volumes** with kernel-level `local` driver options in `srcs/docker-compose.yml`:
 
 ```
 volumes:
@@ -139,6 +139,6 @@ volumes:
 
 #### Why This Works:
 
-1. Docker registers `wordpress_data` and `mariadb_data` as standard **Named Volumes** (visible in `docker volume ls`) [cite: 13, 15].
-2. The `driver_opts` configuration passes system mount flags (`type: none`, `o: bind`) to the Linux kernel, directing volume read/write operations directly to `/home/bchafi/data/*` on the host machine [cite: 13, 15].
-3. When containers are stopped (`make down`) or deleted, the host files under `/home/bchafi/data/*` remain intact, ensuring full data persistence across container deployments [cite: 13, 17, 29].
+1. Docker registers `wordpress_data` and `mariadb_data` as standard **Named Volumes** (visible in `docker volume ls`).
+2. The `driver_opts` configuration passes system mount flags (`type: none`, `o: bind`) to the Linux kernel, directing volume read/write operations directly to `/home/bchafi/data/*` on the host machine .
+3. When containers are stopped (`make down`) or deleted, the host files under `/home/bchafi/data/*` remain intact, ensuring full data persistence across container deployments .

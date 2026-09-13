@@ -1,6 +1,6 @@
-# Inception - User &amp; Administrator Documentation (USER_DOC.md)
-
 *This project has been created as part of the 42 curriculum by bchafi.*
+
+# Inception - User & Administrator Documentation (USER_DOC.md)
 
 ---
 

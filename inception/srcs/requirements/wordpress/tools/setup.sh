@@ -9,13 +9,13 @@ if [ ! -f "wp-config.php" ]; then
     echo "Downloading WordPress core files..."
     php81 -d memory_limit=512M /usr/local/bin/wp core download --allow-root
 
-        echo "Creating wp-config.php..."
-        wp config create \
-            --dbname="${MYSQL_DATABASE}" \
-            --dbuser="${MYSQL_USER}" \
-            --dbpass="${MYSQL_PASSWORD}" \
-            --dbhost="mariadb:3306" \
-        --allow-root
+    echo "Creating wp-config.php..."
+    wp config create \
+        --dbname="${MYSQL_DATABASE}" \
+        --dbuser="${MYSQL_USER}" \
+        --dbpass="${MYSQL_PASSWORD}" \
+        --dbhost="mariadb:3306" \
+    --allow-root
 
     echo "Installing WordPress..."
     wp core install \
